@@ -12,6 +12,7 @@ definition: |
         <li id="nav-elsewhere"><a href="#elsewhere">Web</a></li>
         <li id="nav-fun"><a href="#fun">Passions</a></li>
     </ol>
+warning: This is an old internship application for Facebook. It's a little silly and very out of date, but is preserved as an artifact of my past.
 ---
 
 <div class="bragger">

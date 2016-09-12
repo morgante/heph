@@ -38,7 +38,7 @@
     <%= javascript_include_tag :'waypoints.jquery' %>
   </head>
 
-  <body class="<%= page_classes %>">
+  <body class="<%= page_classes %> <% if current_page.data.warning? %>warned<% end %>">
 
     <div id="grid_overlay">
       <div class="grid">&nbsp;</div>
@@ -69,6 +69,12 @@
     </div>
 
     <div id="page">
+
+      <% if current_page.data.warning? %>
+    <div class="alert alert-warning overlay-warning" role="alert">
+      <p><%= current_page.data.warning %></p>
+    </div>
+    <% end %>
 
       <div class="page_section">
 

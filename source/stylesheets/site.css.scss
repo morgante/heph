@@ -178,6 +178,14 @@ body {
   color: #CECECE;
 }
 
+/* ===WARNING */
+body.warned .overlay-warning {
+  font-size: 200%;
+  border-radius: 0;
+  border-bottom: 5px solid #8a6d3b;
+  text-align: center;
+}
+
 /* ===GREETING */
 #header .section.greeting {
   float: left;
