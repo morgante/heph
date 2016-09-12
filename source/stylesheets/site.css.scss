@@ -182,8 +182,11 @@ body {
 body.warned .overlay-warning {
   font-size: 200%;
   border-radius: 0;
+  border-top: 5px solid #8a6d3b;
   border-bottom: 5px solid #8a6d3b;
   text-align: center;
+  position: relative;
+  top: -15px;
 }
 
 /* ===GREETING */
