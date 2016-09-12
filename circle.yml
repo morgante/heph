@@ -1,3 +1,7 @@
+test:
+  override:
+    - echo 'all good'
+
 deployment:
   production:
     branch: master

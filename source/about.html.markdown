@@ -12,7 +12,7 @@ definition: |
         <li id="nav-elsewhere"><a href="#elsewhere">Web</a></li>
         <li id="nav-fun"><a href="#fun">Passions</a></li>
     </ol>
-warning: This is an old interactive. For an updated career history, check my <a href="https://morgante.net/resume">resume</a>.
+warning: This is an old interactive. For updated info, check my <a href="https://morgante.net/resume">resume</a>.
 ---
 
 <div class="bragger">
