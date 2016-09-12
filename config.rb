@@ -39,6 +39,7 @@ end
 # Redirects
 ###
 
+redirect "hackny.html", to: "/internships/hackny"
 redirect "google.html", to: "/internships/google"
 redirect "facebook.html", to: "/internships/facebook"
 redirect ".well-known/keybase.txt.html", to: "https://gist.githubusercontent.com/morgante/9899709/raw/627116ae34ce28a07f4ee77eb8550782c8fb48db/gistfile1.txt"
