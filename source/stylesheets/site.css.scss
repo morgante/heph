@@ -189,6 +189,11 @@ body.warned .overlay-warning {
   top: -15px;
 }
 
+.overlay-warning a {
+  color: #8a6d3b;
+  text-decoration: underline;
+}
+
 /* ===GREETING */
 #header .section.greeting {
   float: left;
