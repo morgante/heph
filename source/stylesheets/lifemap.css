@@ -1,0 +1,14 @@
+/* LIFEMAP */
+.lifemap {
+	/*background: #eee;*/
+	position: relative;
+}
+
+.lifemap .pointref {
+	height: 0;
+	width: 0;
+	visibility: hidden;
+	position: absolute;
+	left: 0;
+	top: 0;
+}

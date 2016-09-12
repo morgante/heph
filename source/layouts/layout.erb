@@ -18,7 +18,24 @@
     <link href="https://github.com/morgante" rel="me">
 
     <%= stylesheet_link_tag :site %>
-    <%= javascript_include_tag :all %>
+    <%= stylesheet_link_tag :bragger %>
+    <%= stylesheet_link_tag :lifemap %>
+
+    <script   src="https://code.jquery.com/jquery-1.12.4.min.js"   integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ="   crossorigin="anonymous"></script>
+    <%= javascript_include_tag :bootstrap %>
+    <%= javascript_include_tag :bragger %>
+    <%= javascript_include_tag :d3 %>
+    <%= javascript_include_tag :'jquery.smooth-scroll' %>
+    <%= javascript_include_tag :'jquery.subwaymap' %>
+    <%= javascript_include_tag :'jquery.vectormap' %>
+    <%= javascript_include_tag :'world_map' %>
+    <%= javascript_include_tag :jscrollpane %>
+    <%= javascript_include_tag :main %>
+    <%= javascript_include_tag :paper %>
+    <%= javascript_include_tag :skillspin %>
+    <%= javascript_include_tag :lifemap %>
+    <%= javascript_include_tag :underscore %>
+    <%= javascript_include_tag :'waypoints.jquery' %>
   </head>
 
   <body class="<%= page_classes %>">
@@ -41,6 +58,7 @@
         
         <% if current_page.data.definition? %>
         <div class="section definition">
+          <%= current_page.data.definition %>
         </div>
         <% end %>
         
