@@ -21,6 +21,22 @@
     <%= stylesheet_link_tag :bragger %>
     <%= stylesheet_link_tag :lifemap %>
 
+    <script >
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-10543214-1']);
+
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+
+      var ex = document.createElement('script'); ex.type = 'text/javascript'; ex.async = true;
+      ex.src = 'https://www.morgante.net/javascripts/gaextra.js';
+      s.parentNode.insertBefore(ex, s);
+    })();
+    </script>
+
     <script   src="https://code.jquery.com/jquery-1.12.4.min.js"   integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ="   crossorigin="anonymous"></script>
     <%= javascript_include_tag :bootstrap %>
     <%= javascript_include_tag :bragger %>
