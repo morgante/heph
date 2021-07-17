@@ -1,6 +1,7 @@
 import * as React from "react"
 import PropTypes from "prop-types"
 import axios from 'axios'
+import { useEffect } from "react";
 
 type Props = {
   message: string;
@@ -8,12 +9,12 @@ type Props = {
 };
 type State = {
 };
-class GitHubActivity extends React.Component<Props, State> {
-  state: State = {
-  };
-  componentDidMount() {
-    const { username } = this.props;
-    console.log("component mounted");
+
+const GitHubActivity = ({
+  message,
+  username
+}: Props) => {
+  useEffect(() => {
     axios.get(`https://api.github.com/users/${username}`)
       .then(function (response) {
         // handle success
@@ -23,16 +24,13 @@ class GitHubActivity extends React.Component<Props, State> {
         // handle error
         console.log(error);
       });
-  }
-  render() {
-    const { message } = this.props;
-    return (
-      <div>
-        <p>Cooler</p>
-        {message}
-      </div>
-    );
-  }
-}
+  }, [username]);
+  return (
+    <div>
+      <p>Coolests</p>
+      {message}
+    </div>
+  );
+};
 
 export default GitHubActivity;
