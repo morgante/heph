@@ -15,15 +15,33 @@ const GitHubActivity = ({
   username
 }: Props) => {
   useEffect(() => {
-    axios.get(`https://api.github.com/users/${username}`)
-      .then(function (response) {
-        // handle success
-        console.log(response);
-      })
-      .catch(function (error) {
-        // handle error
-        console.log(error);
-      });
+    axios.post(`https://api.github.com/graphql`, {
+      query: `query {
+        user(login: "morgante") { 
+          contributionsCollection {
+            earliestRestrictedContributionDate
+            latestRestrictedContributionDate
+            contributionCalendar {
+              totalContributions
+            }
+          }
+        }
+      }`
+    }).then((response) => {
+      console.log("gql", response);
+    }).catch((err) => {
+      console.log(err);
+    });
+
+    // axios.get(`https://api.github.com/users/${username}`)
+    //   .then(function (response) {
+    //     // handle success
+    //     console.log(response);
+    //   })
+    //   .catch(function (error) {
+    //     // handle error
+    //     console.log(error);
+    //   });
   }, [username]);
   return (
     <div>
