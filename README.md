@@ -1,4 +1,12 @@
-# gatsby-starter-default
-The default Gatsby starter
+# Heph
+This is the code behind personal website.
 
-Install this starter (assuming Gatsby is installed) by running from your CLI: gatsby new gatsby-example-site
+## Development
+
+1. Install dependencies
+
+    npm install -d
+
+2. Run gatsby development server
+
+    gatsby develop
