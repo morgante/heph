@@ -1,7 +1,8 @@
 import * as React from "react"
 import PropTypes from "prop-types"
 import axios from 'axios'
-import { useEffect } from "react";
+import { graphql, useStaticQuery } from "gatsby"
+import { useEffect } from "react"
 
 type Props = {
   message: string;
@@ -14,25 +15,21 @@ const GitHubActivity = ({
   message,
   username
 }: Props) => {
-  useEffect(() => {
-    axios.post(`https://api.github.com/graphql`, {
-      query: `query {
-        user(login: "morgante") { 
-          contributionsCollection {
-            earliestRestrictedContributionDate
-            latestRestrictedContributionDate
-            contributionCalendar {
-              totalContributions
-            }
-          }
+  const gatsbyRepoData = useStaticQuery(graphql`
+    query {
+      github {
+        repository(name: "gatsby", owner: "gatsbyjs") {
+          id
+          nameWithOwner
+          url
         }
-      }`
-    }).then((response) => {
-      console.log("gql", response);
-    }).catch((err) => {
-      console.log(err);
-    });
+      }
+    }
+  `)
 
+  console.log("data", gatsbyRepoData);
+
+  useEffect(() => {
     // axios.get(`https://api.github.com/users/${username}`)
     //   .then(function (response) {
     //     // handle success
