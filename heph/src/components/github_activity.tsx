@@ -18,10 +18,18 @@ const GitHubActivity = ({
   const gatsbyRepoData = useStaticQuery(graphql`
     query {
       github {
-        repository(name: "gatsby", owner: "gatsbyjs") {
-          id
-          nameWithOwner
-          url
+        user(login: "morgante") {
+          contributionsCollection {
+            contributionCalendar {
+              weeks {
+                contributionDays {
+                  date
+                  contributionCount
+                  contributionLevel
+                }
+              }
+            }
+          }
         }
       }
     }

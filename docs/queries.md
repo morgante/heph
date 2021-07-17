@@ -8,7 +8,13 @@ query {
       earliestRestrictedContributionDate
       latestRestrictedContributionDate
       contributionCalendar {
-        totalContributions
+        weeks {
+          contributionDays {
+            date
+            contributionCount
+            contributionLevel
+          }
+        }
       }
     }
   }
