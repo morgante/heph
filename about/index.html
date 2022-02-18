@@ -21,21 +21,16 @@
     <link href="/stylesheets/bragger.css" rel="stylesheet" />
     <link href="/stylesheets/lifemap.css" rel="stylesheet" />
 
-    <script >
-    var _gaq = _gaq || [];
-    _gaq.push(['_setAccount', 'UA-10543214-1']);
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-10543214-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
 
-
-    (function() {
-      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-
-      var ex = document.createElement('script'); ex.type = 'text/javascript'; ex.async = true;
-      ex.src = 'https://www.morgante.net/javascripts/gaextra.js';
-      s.parentNode.insertBefore(ex, s);
-    })();
+      gtag('config', 'UA-10543214-1');
     </script>
+
 
     <script   src="https://code.jquery.com/jquery-1.12.4.min.js"   integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ="   crossorigin="anonymous"></script>
     <script src="/javascripts/bootstrap.js"></script>
@@ -320,7 +315,7 @@
 
     <div id="footer" class="footer">
       <div class="page_section">
-        <p class="copyright">&copy; 2021 Morgante Pell</p>
+        <p class="copyright">&copy; 2022 Morgante Pell</p>
         <p class="engine"><a href="https://middlemanapp.com/">Powered by Middleman</a></p>
       </div>
     </div>
