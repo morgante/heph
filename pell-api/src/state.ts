@@ -5,11 +5,10 @@ const EXPIRATION_MS = (env: Env) => Number(env.GUESTBOOK_EXPIRATION_MS); // Expi
 interface Session {
 	webSocket: WebSocket;
 	username: string;
-	quit?: boolean;
 }
 
 interface WebSocketMessage {
-	type: "user_joined" | "user_left";
+	type: "user_joined" | "user_expired";
 	username: string;
 }
 
@@ -40,33 +39,14 @@ export class SharedState extends DurableObject<Env> {
 	}
 
 	private broadcast(message: WebSocketMessage) {
-		// Convert to string if it's not already
-		const messageStr =
-			typeof message === "string" ? message : JSON.stringify(message);
-
-		// Track sessions that need to be removed
-		const quitters: Session[] = [];
+		const messageStr = JSON.stringify(message);
 
 		for (const [webSocket, session] of this.sessions) {
-			if (session.quit) continue;
-
 			try {
 				webSocket.send(messageStr);
 			} catch (err) {
-				// Connection is dead, mark for removal
 				session.quit = true;
-				quitters.push(session);
 				this.sessions.delete(webSocket);
-			}
-		}
-
-		// Notify about any connections that died during broadcast
-		for (const quitter of quitters) {
-			if (quitter.username) {
-				this.broadcast({
-					type: "user_left",
-					username: quitter.username,
-				});
 			}
 		}
 	}
@@ -75,15 +55,7 @@ export class SharedState extends DurableObject<Env> {
 		const session = this.sessions.get(webSocket);
 		if (!session) return;
 
-		session.quit = true;
 		this.sessions.delete(webSocket);
-
-		if (session.username) {
-			this.broadcast({
-				type: "user_left",
-				username: session.username,
-			});
-		}
 	}
 
 	async webSocketClose(webSocket: WebSocket) {
