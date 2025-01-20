@@ -79,6 +79,7 @@ export class SharedState extends DurableObject<Env> {
 
 		const guestbook: GuestbookEntry[] =
 			(await this.ctx.storage.get("guestbook")) ?? [];
+
 		const now = new Date();
 		const filtered = guestbook.filter((entry) => {
 			const lastVisit = new Date(entry.lastVisitDate);
@@ -108,12 +109,9 @@ export class SharedState extends DurableObject<Env> {
 		return filtered;
 	}
 
-	private async scheduleExpiration() {
-		const guestbook: GuestbookEntry[] =
-			(await this.ctx.storage.get("guestbook")) ?? [];
-
+	private async scheduleExpiration(entries: GuestbookEntry[]) {
 		if (guestbook.length === 0) {
-			console.log("No entries to expire");
+			console.log("Guestbook is empty, no expiration needed");
 			// No entries to expire
 			return;
 		}
@@ -142,9 +140,9 @@ export class SharedState extends DurableObject<Env> {
 	}
 
 	async alarm() {
-		await this.expire();
+		const guestbook = await this.expire();
 		// Schedule the next cleanup
-		await this.scheduleExpiration();
+		await this.scheduleExpiration(guestbook);
 	}
 
 	private async incrementVisitors() {
@@ -179,7 +177,7 @@ export class SharedState extends DurableObject<Env> {
 		}
 
 		await this.ctx.storage.put("guestbook", guestbook);
-		await this.scheduleExpiration();
+		await this.scheduleExpiration(guestbook);
 		const visitors = await this.incrementVisitors();
 
 		const entry = existingEntry ?? guestbook[guestbook.length - 1];
