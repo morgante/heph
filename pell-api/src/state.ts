@@ -6,6 +6,7 @@ export interface GuestbookEntry {
 	username: string;
 	signInDate: string;
 	lastVisitDate: string;
+	visitorId: string;
 }
 
 export class SharedState extends DurableObject<Env> {
@@ -79,6 +80,7 @@ export class SharedState extends DurableObject<Env> {
 				username,
 				signInDate: now,
 				lastVisitDate: now,
+				visitorId: crypto.randomUUID(),
 			});
 		}
 
