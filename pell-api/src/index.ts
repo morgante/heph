@@ -28,6 +28,31 @@ app.post("/sign", async (c) => {
 	return c.json(result);
 });
 
+app.get("/websocket", async (c) => {
+	const username = c.req.query("username");
+	if (!username) {
+		return c.json({ error: "Username is required" }, 400);
+	}
+
+	// Check if it's a WebSocket request
+	const upgradeHeader = c.req.header("Upgrade");
+	if (!upgradeHeader || upgradeHeader !== "websocket") {
+		return c.json({ error: "Expected WebSocket connection" }, 400);
+	}
+
+	const env = c.env;
+	const id: DurableObjectId = env.DURABLE_STATE.idFromName(env.APP);
+	const stub = env.DURABLE_STATE.get(id);
+
+	const pair = new WebSocketPair();
+	await stub.handleWebSocket(pair[1], username);
+
+	return new Response(null, {
+		status: 101,
+		webSocket: pair[0],
+	});
+});
+
 export default {
 	fetch: app.fetch,
 } satisfies ExportedHandler<Env>;

@@ -2,6 +2,17 @@ import { DurableObject } from "cloudflare:workers";
 
 const EXPIRATION_MS = (env: Env) => Number(env.GUESTBOOK_EXPIRATION_MS); // Expiration time in milliseconds from environment variable
 
+interface Session {
+	webSocket: WebSocket;
+	username: string;
+	quit?: boolean;
+}
+
+interface WebSocketMessage {
+	type: "user_joined" | "user_left";
+	username: string;
+}
+
 export interface GuestbookEntry {
 	username: string;
 	signInDate: string;
@@ -11,11 +22,80 @@ export interface GuestbookEntry {
 
 export class SharedState extends DurableObject<Env> {
 	ctx: DurableObjectState;
+	sessions: Map<WebSocket, Session>;
 
 	constructor(state: DurableObjectState, env: Env) {
 		console.log(`Construting shared state for ${env.APP}`);
 		super(state, env);
 		this.ctx = state;
+		this.sessions = new Map();
+
+		// Restore any existing WebSocket sessions
+		for (const webSocket of this.ctx.getWebSockets()) {
+			const meta = webSocket.deserializeAttachment();
+			if (meta?.username) {
+				this.sessions.set(webSocket, { webSocket, username: meta.username });
+			}
+		}
+	}
+
+	private broadcast(message: WebSocketMessage) {
+		// Convert to string if it's not already
+		const messageStr =
+			typeof message === "string" ? message : JSON.stringify(message);
+
+		// Track sessions that need to be removed
+		const quitters: Session[] = [];
+
+		for (const [webSocket, session] of this.sessions) {
+			if (session.quit) continue;
+
+			try {
+				webSocket.send(messageStr);
+			} catch (err) {
+				// Connection is dead, mark for removal
+				session.quit = true;
+				quitters.push(session);
+				this.sessions.delete(webSocket);
+			}
+		}
+
+		// Notify about any connections that died during broadcast
+		for (const quitter of quitters) {
+			if (quitter.username) {
+				this.broadcast({
+					type: "user_left",
+					username: quitter.username,
+				});
+			}
+		}
+	}
+
+	private async closeOrErrorHandler(webSocket: WebSocket) {
+		const session = this.sessions.get(webSocket);
+		if (!session) return;
+
+		session.quit = true;
+		this.sessions.delete(webSocket);
+
+		if (session.username) {
+			this.broadcast({
+				type: "user_left",
+				username: session.username,
+			});
+		}
+	}
+
+	async webSocketClose(webSocket: WebSocket) {
+		await this.closeOrErrorHandler(webSocket);
+	}
+
+	async webSocketError(webSocket: WebSocket) {
+		await this.closeOrErrorHandler(webSocket);
+	}
+
+	async webSocketMessage(ws: WebSocket, message: string) {
+		console.log("Received message:", message);
 	}
 
 	private async expire() {
@@ -32,7 +112,19 @@ export class SharedState extends DurableObject<Env> {
 
 		if (filtered.length !== guestbook.length) {
 			await this.ctx.storage.put("guestbook", filtered);
-			console.log("Expired guestbook entries");
+
+			// Notify all clients about expired users
+			const expiredUsers = guestbook.filter(
+				(entry) => !filtered.find((f) => f.username === entry.username),
+			);
+			console.log(`Expired guestbook entries: ${expiredUsers.length}`);
+
+			for (const expiredUser of expiredUsers) {
+				this.broadcast({
+					type: "user_left",
+					username: expiredUser.username,
+				});
+			}
 			return filtered;
 		}
 
