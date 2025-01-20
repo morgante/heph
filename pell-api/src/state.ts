@@ -89,7 +89,7 @@ export class SharedState extends DurableObject<Env> {
 		return { visitors };
 	}
 
-	async sign(username: string, request: Request) {
+	async sign(username: string) {
 		const now = new Date().toISOString();
 		const guestbook: GuestbookEntry[] =
 			(await this.ctx.storage.get("guestbook")) ?? [];
@@ -115,15 +115,10 @@ export class SharedState extends DurableObject<Env> {
 		const entry = existingEntry ?? guestbook[guestbook.length - 1];
 		const { signInDate, ...responseEntry } = entry;
 
-		return new Response(
-			JSON.stringify({
-				success: true,
-				entry: responseEntry,
-				visitors,
-			}),
-			{
-				headers: { "Content-Type": "application/json" },
-			},
-		);
+		return {
+			success: true,
+			entry: responseEntry,
+			visitors,
+		};
 	}
 }
