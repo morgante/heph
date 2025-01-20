@@ -24,7 +24,9 @@ export class SharedState extends DurableObject<Env> {
 	sessions: Map<WebSocket, Session>;
 
 	constructor(state: DurableObjectState, env: Env) {
-		console.log(`Construting shared state for ${env.APP}`);
+		console.log(
+			`Constructing shared state for ${env.APP}, with expiration time of ${EXPIRATION_MS(env)}ms`,
+		);
 		super(state, env);
 		this.ctx = state;
 		this.sessions = new Map();
@@ -71,7 +73,7 @@ export class SharedState extends DurableObject<Env> {
 	}
 
 	private async expire() {
-		console.log("Expiring guestbook");
+		console.log("Expiring guestbook...");
 
 		const guestbook: GuestbookEntry[] =
 			(await this.ctx.storage.get("guestbook")) ?? [];
@@ -100,18 +102,11 @@ export class SharedState extends DurableObject<Env> {
 			return filtered;
 		}
 
-		console.log("No entries to expire");
+		console.log("No entries to expire", filtered);
 		return filtered;
 	}
 
 	private async scheduleExpiration() {
-		// Check if there's already an alarm scheduled
-		const existingAlarm = await this.ctx.storage.getAlarm();
-		if (existingAlarm) {
-			console.log("Alarm already scheduled");
-			return;
-		}
-
 		const guestbook: GuestbookEntry[] =
 			(await this.ctx.storage.get("guestbook")) ?? [];
 
@@ -132,6 +127,14 @@ export class SharedState extends DurableObject<Env> {
 			new Date(nextToExpire.lastVisitDate).getTime() +
 			EXPIRATION_MS(this.env) +
 			100;
+
+		// Check if there's already an alarm scheduled
+		const existingAlarm = await this.ctx.storage.getAlarm();
+		if (existingAlarm && existingAlarm < expirationTime) {
+			console.log("Alarm already scheduled to run before next expiration");
+			return;
+		}
+
 		await this.ctx.storage.setAlarm(expirationTime);
 	}
 
