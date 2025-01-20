@@ -3,6 +3,7 @@ import { unstable_dev } from "wrangler";
 import type { Unstable_DevWorker } from "wrangler";
 
 interface VisitorResponse {
+	app: string;
 	visitors: number;
 }
 
@@ -34,6 +35,9 @@ describe("Guestbook API", () => {
 		const resp = await worker.fetch("/");
 		expect(resp.status).toBe(200);
 		const data = (await resp.json()) as VisitorResponse;
+		expect(data).toHaveProperty("app");
+		expect(typeof data.app).toBe("string");
+		expect(data.app).toContain("test");
 		expect(data).toHaveProperty("visitors");
 		expect(typeof data.visitors).toBe("number");
 	});
@@ -88,7 +92,7 @@ describe("Guestbook API", () => {
 	});
 
 	it("should expire guestbook after expiration time", async () => {
-		const username = "test_user_expire";
+		const username = `test_user_expire_${Math.random().toString(36).substring(2, 15)}`;
 		const resp = await worker.fetch(`/sign?username=${username}`, {
 			method: "POST",
 		});
@@ -102,13 +106,22 @@ describe("Guestbook API", () => {
 			visitorId: expect.any(String),
 		});
 
-		await new Promise((resolve) => setTimeout(resolve, 200));
-
+		// Check again immediately
 		const resp2 = await worker.fetch(`/sign?username=${username}`, {
 			method: "POST",
 		});
 		expect(resp2.status).toBe(200);
 		const data2 = (await resp2.json()) as GuestbookResponse;
-		expect(data2.entry.visitorId).not.toBe(data.entry.visitorId); // Should get new visitor ID after expiration
+		expect(data2.entry.visitorId).toBe(data.entry.visitorId);
+
+		// Wait for it to expire
+		await new Promise((resolve) => setTimeout(resolve, 300));
+
+		const resp3 = await worker.fetch(`/sign?username=${username}`, {
+			method: "POST",
+		});
+		expect(resp3.status).toBe(200);
+		const data3 = (await resp3.json()) as GuestbookResponse;
+		expect(data3.entry.visitorId).not.toBe(data.entry.visitorId); // Should get new visitor ID after expiration
 	});
 });

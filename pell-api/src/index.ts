@@ -11,7 +11,10 @@ app.get("/", async (c) => {
 	const stub = env.DURABLE_STATE.get(id);
 	const { visitors } = await stub.visit();
 
-	return c.json({ visitors });
+	return c.json({
+		app: env.APP,
+		visitors,
+	});
 });
 
 app.post("/sign", async (c) => {
@@ -26,6 +29,20 @@ app.post("/sign", async (c) => {
 	const result = await stub.sign(username);
 
 	return c.json(result);
+});
+
+app.get("/websocket", async (c) => {
+	// Check if it's a WebSocket request
+	const upgradeHeader = c.req.header("Upgrade");
+	if (!upgradeHeader || upgradeHeader !== "websocket") {
+		return c.json({ error: "Expected WebSocket connection" }, 400);
+	}
+
+	const env = c.env;
+	const id: DurableObjectId = env.DURABLE_STATE.idFromName(env.APP);
+	const stub = env.DURABLE_STATE.get(id);
+
+	return stub.fetch(c.req.raw);
 });
 
 export default {

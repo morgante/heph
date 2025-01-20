@@ -2,6 +2,16 @@ import { DurableObject } from "cloudflare:workers";
 
 const EXPIRATION_MS = (env: Env) => Number(env.GUESTBOOK_EXPIRATION_MS); // Expiration time in milliseconds from environment variable
 
+interface Session {
+	webSocket: WebSocket;
+	username: string;
+}
+
+interface WebSocketMessage {
+	type: "user_joined" | "user_expired";
+	username: string;
+}
+
 export interface GuestbookEntry {
 	username: string;
 	signInDate: string;
@@ -11,18 +21,65 @@ export interface GuestbookEntry {
 
 export class SharedState extends DurableObject<Env> {
 	ctx: DurableObjectState;
+	sessions: Map<WebSocket, Session>;
 
 	constructor(state: DurableObjectState, env: Env) {
-		console.log(`Construting shared state for ${env.APP}`);
+		console.log(
+			`Constructing shared state for ${env.APP}, with expiration time of ${EXPIRATION_MS(env)}ms`,
+		);
 		super(state, env);
 		this.ctx = state;
+		this.sessions = new Map();
+
+		this.ctx.blockConcurrencyWhile(async () => {
+			// Restore any existing WebSocket sessions
+			for (const webSocket of this.ctx.getWebSockets()) {
+				const meta = webSocket.deserializeAttachment();
+				if (meta?.username) {
+					this.sessions.set(webSocket, { webSocket, username: meta.username });
+				}
+			}
+		});
+	}
+
+	private broadcast(message: WebSocketMessage) {
+		const messageStr = JSON.stringify(message);
+
+		for (const [webSocket, session] of this.sessions) {
+			try {
+				webSocket.send(messageStr);
+			} catch (err) {
+				session.quit = true;
+				this.sessions.delete(webSocket);
+			}
+		}
+	}
+
+	private async closeOrErrorHandler(webSocket: WebSocket) {
+		const session = this.sessions.get(webSocket);
+		if (!session) return;
+
+		this.sessions.delete(webSocket);
+	}
+
+	async webSocketClose(webSocket: WebSocket) {
+		await this.closeOrErrorHandler(webSocket);
+	}
+
+	async webSocketError(webSocket: WebSocket) {
+		await this.closeOrErrorHandler(webSocket);
+	}
+
+	async webSocketMessage(ws: WebSocket, message: string) {
+		console.log("Received message:", message);
 	}
 
 	private async expire() {
-		console.log("Expiring guestbook");
+		console.log("Expiring guestbook...");
 
 		const guestbook: GuestbookEntry[] =
 			(await this.ctx.storage.get("guestbook")) ?? [];
+
 		const now = new Date();
 		const filtered = guestbook.filter((entry) => {
 			const lastVisit = new Date(entry.lastVisitDate);
@@ -32,27 +89,29 @@ export class SharedState extends DurableObject<Env> {
 
 		if (filtered.length !== guestbook.length) {
 			await this.ctx.storage.put("guestbook", filtered);
-			console.log("Expired guestbook entries");
+
+			// Notify all clients about expired users
+			const expiredUsers = guestbook.filter(
+				(entry) => !filtered.find((f) => f.username === entry.username),
+			);
+			console.log(`Expired guestbook entries: ${expiredUsers.length}`);
+
+			for (const expiredUser of expiredUsers) {
+				this.broadcast({
+					type: "user_left",
+					username: expiredUser.username,
+				});
+			}
 			return filtered;
 		}
 
-		console.log("No entries to expire");
+		console.log("No entries to expire", filtered);
 		return filtered;
 	}
 
-	private async scheduleExpiration() {
-		// Check if there's already an alarm scheduled
-		const existingAlarm = await this.ctx.storage.getAlarm();
-		if (existingAlarm) {
-			console.log("Alarm already scheduled");
-			return;
-		}
-
-		const guestbook: GuestbookEntry[] =
-			(await this.ctx.storage.get("guestbook")) ?? [];
-
+	private async scheduleExpiration(entries: GuestbookEntry[]) {
 		if (guestbook.length === 0) {
-			console.log("No entries to expire");
+			console.log("Guestbook is empty, no expiration needed");
 			// No entries to expire
 			return;
 		}
@@ -64,17 +123,26 @@ export class SharedState extends DurableObject<Env> {
 			return entryDate < earliestDate ? entry : earliest;
 		});
 
-		const expirationTime =
+		// Set a check time slightly after the next entry to expire
+		const checkTime =
 			new Date(nextToExpire.lastVisitDate).getTime() +
 			EXPIRATION_MS(this.env) +
-			100;
-		await this.ctx.storage.setAlarm(expirationTime);
+			10;
+
+		// Check if there's already an alarm scheduled
+		const existingAlarm = await this.ctx.storage.getAlarm();
+		if (existingAlarm && existingAlarm < checkTime) {
+			console.log("Alarm already scheduled to run before next expiration");
+			return;
+		}
+
+		await this.ctx.storage.setAlarm(checkTime);
 	}
 
 	async alarm() {
-		await this.expire();
+		const guestbook = await this.expire();
 		// Schedule the next cleanup
-		await this.scheduleExpiration();
+		await this.scheduleExpiration(guestbook);
 	}
 
 	private async incrementVisitors() {
@@ -109,7 +177,7 @@ export class SharedState extends DurableObject<Env> {
 		}
 
 		await this.ctx.storage.put("guestbook", guestbook);
-		await this.scheduleExpiration();
+		await this.scheduleExpiration(guestbook);
 		const visitors = await this.incrementVisitors();
 
 		const entry = existingEntry ?? guestbook[guestbook.length - 1];

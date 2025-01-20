@@ -32,7 +32,7 @@
 		// Identifier for app, shared across deployment
 		"APP": "pell",
 		// 5 minutes
-		"GUESTBOOK_EXPIRATION_MS": 300000
+		"GUESTBOOK_EXPIRATION_MS": 10000
 	},
 	"env": {
 		"dev": {
@@ -51,7 +51,7 @@
 		},
 		"test": {
 			"vars": {
-				"APP": "pelltest2",
+				"APP": "pelltest3",
 				"GUESTBOOK_EXPIRATION_MS": 100
 			},
 			"durable_objects": {
