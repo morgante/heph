@@ -41,6 +41,13 @@ export class SharedState extends DurableObject<Env> {
 	}
 
 	private async scheduleExpiration() {
+		// Check if there's already an alarm scheduled
+		const existingAlarm = await this.ctx.storage.getAlarm();
+		if (existingAlarm) {
+			console.log("Alarm already scheduled");
+			return;
+		}
+
 		const guestbook: GuestbookEntry[] =
 			(await this.ctx.storage.get("guestbook")) ?? [];
 

@@ -31,9 +31,24 @@
 	"vars": {
 		// Identifier for app, shared across deployment
 		"APP": "pell",
-		"GUESTBOOK_EXPIRATION_MS": 10000
+		// 5 minutes
+		"GUESTBOOK_EXPIRATION_MS": 300000
 	},
 	"env": {
+		"dev": {
+			"vars": {
+				"GUESTBOOK_EXPIRATION_MS": 10000,
+				"APP": "pelldev"
+			},
+			"durable_objects": {
+				"bindings": [
+					{
+						"class_name": "SharedState",
+						"name": "DURABLE_STATE"
+					}
+				]
+			}
+		},
 		"test": {
 			"vars": {
 				"APP": "pelltest2",
