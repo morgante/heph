@@ -10,15 +10,15 @@ export default {
 	 * @returns The response to be sent back to the client
 	 */
 	async fetch(request, env, ctx): Promise<Response> {
-		let id: DurableObjectId = env.DURABLE_STATE.idFromName(
+		const id: DurableObjectId = env.DURABLE_STATE.idFromName(
 			new URL(request.url).pathname,
 		);
 
-		let stub = env.DURABLE_STATE.get(id);
+		const stub = env.DURABLE_STATE.get(id);
 
 		// We call the `sayHello()` RPC method on the stub to invoke the method on the remote
 		// Durable Object instance
-		let { visitors } = await stub.visit();
+		const { visitors } = await stub.visit();
 
 		return new Response(JSON.stringify({ visitors }));
 	},
