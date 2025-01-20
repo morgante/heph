@@ -11,6 +11,8 @@ export interface GuestbookEntry {
 
 export class SharedState extends DurableObject<Env> {
 	private async expire() {
+		console.log("Expiring guestbook");
+
 		const guestbook: GuestbookEntry[] =
 			(await this.ctx.storage.get("guestbook")) ?? [];
 		const now = new Date();
@@ -22,7 +24,11 @@ export class SharedState extends DurableObject<Env> {
 
 		if (filtered.length !== guestbook.length) {
 			await this.ctx.storage.put("guestbook", filtered);
+			console.log("Expired guestbook entries");
+			return filtered;
 		}
+
+		console.log("No entries to expire");
 		return filtered;
 	}
 
@@ -31,6 +37,7 @@ export class SharedState extends DurableObject<Env> {
 			(await this.ctx.storage.get("guestbook")) ?? [];
 
 		if (guestbook.length === 0) {
+			console.log("No entries to expire");
 			// No entries to expire
 			return;
 		}
@@ -43,7 +50,7 @@ export class SharedState extends DurableObject<Env> {
 		});
 
 		const expirationTime =
-			new Date(nextToExpire.lastVisitDate).getTime() + EXPIRATION_MS;
+			new Date(nextToExpire.lastVisitDate).getTime() + EXPIRATION_MS + 100;
 		await this.ctx.storage.setAlarm(expirationTime);
 	}
 
