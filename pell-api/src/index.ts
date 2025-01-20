@@ -14,6 +14,20 @@ app.get("/", async (c) => {
 	return c.json({ visitors });
 });
 
+app.post("/sign", async (c) => {
+	const username = c.req.query("username");
+	if (!username) {
+		return c.json({ error: "Username is required" }, 400);
+	}
+
+	const env = c.env;
+	const id: DurableObjectId = env.DURABLE_STATE.idFromName(env.APP);
+	const stub = env.DURABLE_STATE.get(id);
+	const result = await stub.sign(username);
+
+	return c.json(result);
+});
+
 export default {
 	fetch: app.fetch,
 } satisfies ExportedHandler<Env>;
