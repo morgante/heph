@@ -4,6 +4,7 @@ import type { Unstable_DevWorker } from "wrangler";
 
 interface VisitorResponse {
 	visitors: number;
+	app: string;
 }
 
 interface GuestbookResponse {
@@ -36,6 +37,7 @@ describe("Guestbook API", () => {
 		const data = (await resp.json()) as VisitorResponse;
 		expect(data).toHaveProperty("visitors");
 		expect(typeof data.visitors).toBe("number");
+		expect(data.app).toContain("test");
 	});
 
 	it("should require username for sign endpoint", async () => {

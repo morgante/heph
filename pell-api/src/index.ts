@@ -9,9 +9,9 @@ app.get("/", async (c) => {
 	const env = c.env;
 	const id: DurableObjectId = env.DURABLE_STATE.idFromName(env.APP);
 	const stub = env.DURABLE_STATE.get(id);
-	const { visitors } = await stub.visit();
+	const { visitors, guestbook } = await stub.visit();
 
-	return c.json({ visitors });
+	return c.json({ visitors, app: env.APP, guestbook });
 });
 
 app.post("/sign", async (c) => {
