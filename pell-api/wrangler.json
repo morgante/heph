@@ -36,8 +36,16 @@
 	"env": {
 		"test": {
 			"vars": {
-				"APP": "pelltest",
+				"APP": "pelltest2",
 				"GUESTBOOK_EXPIRATION_MS": 100
+			},
+			"durable_objects": {
+				"bindings": [
+					{
+						"class_name": "SharedState",
+						"name": "DURABLE_STATE"
+					}
+				]
 			}
 		}
 	}

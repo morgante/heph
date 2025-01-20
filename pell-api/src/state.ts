@@ -13,6 +13,7 @@ export class SharedState extends DurableObject<Env> {
 	ctx: DurableObjectState;
 
 	constructor(state: DurableObjectState, env: Env) {
+		console.log(`Construting shared state for ${env.APP}`);
 		super(state, env);
 		this.ctx = state;
 	}

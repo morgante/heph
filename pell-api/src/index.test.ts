@@ -102,8 +102,7 @@ describe("Guestbook API", () => {
 			visitorId: expect.any(String),
 		});
 
-		// Wait for expiration (100ms in test env + buffer)
-		await new Promise((resolve) => setTimeout(resolve, 150));
+		await new Promise((resolve) => setTimeout(resolve, 200));
 
 		const resp2 = await worker.fetch(`/sign?username=${username}`, {
 			method: "POST",
