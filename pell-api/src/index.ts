@@ -11,7 +11,7 @@ app.get("/", async (c) => {
 	const stub = env.DURABLE_STATE.get(id);
 	const { visitors } = await stub.visit();
 
-	return c.json({ visitors });
+	return c.json({ visitors, app: env.APP });
 });
 
 app.post("/sign", async (c) => {
