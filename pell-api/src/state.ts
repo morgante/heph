@@ -31,13 +31,15 @@ export class SharedState extends DurableObject<Env> {
 		this.ctx = state;
 		this.sessions = new Map();
 
-		// Restore any existing WebSocket sessions
-		for (const webSocket of this.ctx.getWebSockets()) {
-			const meta = webSocket.deserializeAttachment();
-			if (meta?.username) {
-				this.sessions.set(webSocket, { webSocket, username: meta.username });
+		this.ctx.blockConcurrencyWhile(async () => {
+			// Restore any existing WebSocket sessions
+			for (const webSocket of this.ctx.getWebSockets()) {
+				const meta = webSocket.deserializeAttachment();
+				if (meta?.username) {
+					this.sessions.set(webSocket, { webSocket, username: meta.username });
+				}
 			}
-		}
+		});
 	}
 
 	private broadcast(message: WebSocketMessage) {
@@ -123,19 +125,20 @@ export class SharedState extends DurableObject<Env> {
 			return entryDate < earliestDate ? entry : earliest;
 		});
 
-		const expirationTime =
+		// Set a check time slightly after the next entry to expire
+		const checkTime =
 			new Date(nextToExpire.lastVisitDate).getTime() +
 			EXPIRATION_MS(this.env) +
-			100;
+			10;
 
 		// Check if there's already an alarm scheduled
 		const existingAlarm = await this.ctx.storage.getAlarm();
-		if (existingAlarm && existingAlarm < expirationTime) {
+		if (existingAlarm && existingAlarm < checkTime) {
 			console.log("Alarm already scheduled to run before next expiration");
 			return;
 		}
 
-		await this.ctx.storage.setAlarm(expirationTime);
+		await this.ctx.storage.setAlarm(checkTime);
 	}
 
 	async alarm() {

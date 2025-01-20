@@ -106,13 +106,22 @@ describe("Guestbook API", () => {
 			visitorId: expect.any(String),
 		});
 
-		await new Promise((resolve) => setTimeout(resolve, 3000));
-
+		// Check again immediately
 		const resp2 = await worker.fetch(`/sign?username=${username}`, {
 			method: "POST",
 		});
 		expect(resp2.status).toBe(200);
 		const data2 = (await resp2.json()) as GuestbookResponse;
-		expect(data2.entry.visitorId).not.toBe(data.entry.visitorId); // Should get new visitor ID after expiration
+		expect(data2.entry.visitorId).toBe(data.entry.visitorId);
+
+		// Wait for it to expire
+		await new Promise((resolve) => setTimeout(resolve, 300));
+
+		const resp3 = await worker.fetch(`/sign?username=${username}`, {
+			method: "POST",
+		});
+		expect(resp3.status).toBe(200);
+		const data3 = (await resp3.json()) as GuestbookResponse;
+		expect(data3.entry.visitorId).not.toBe(data.entry.visitorId); // Should get new visitor ID after expiration
 	});
 });
