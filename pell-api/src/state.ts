@@ -18,7 +18,7 @@ export class SharedState extends DurableObject<Env> {
 		this.ctx = state;
 	}
 
-	private async expire() {
+	private async getAndExpire() {
 		console.log("Expiring guestbook");
 
 		const guestbook: GuestbookEntry[] =
@@ -40,16 +40,13 @@ export class SharedState extends DurableObject<Env> {
 		return filtered;
 	}
 
-	private async scheduleExpiration() {
+	private async scheduleExpiration(guestbook: GuestbookEntry[]) {
 		// Check if there's already an alarm scheduled
 		const existingAlarm = await this.ctx.storage.getAlarm();
 		if (existingAlarm) {
 			console.log("Alarm already scheduled");
 			return;
 		}
-
-		const guestbook: GuestbookEntry[] =
-			(await this.ctx.storage.get("guestbook")) ?? [];
 
 		if (guestbook.length === 0) {
 			console.log("No entries to expire");
@@ -67,14 +64,15 @@ export class SharedState extends DurableObject<Env> {
 		const expirationTime =
 			new Date(nextToExpire.lastVisitDate).getTime() +
 			EXPIRATION_MS(this.env) +
-			100;
-		await this.ctx.storage.setAlarm(expirationTime);
+			10;
+
+		await this.ctx.storage.setAlarm(expirationTime, {});
 	}
 
 	async alarm() {
-		await this.expire();
+		const entries = await this.getAndExpire();
 		// Schedule the next cleanup
-		await this.scheduleExpiration();
+		await this.scheduleExpiration(entries);
 	}
 
 	private async incrementVisitors() {
@@ -91,8 +89,8 @@ export class SharedState extends DurableObject<Env> {
 
 	async sign(username: string) {
 		const now = new Date().toISOString();
-		const guestbook: GuestbookEntry[] =
-			(await this.ctx.storage.get("guestbook")) ?? [];
+		const guestbook = await this.getAndExpire();
+
 		const existingEntry = guestbook.find(
 			(entry) => entry.username === username,
 		);
@@ -109,7 +107,8 @@ export class SharedState extends DurableObject<Env> {
 		}
 
 		await this.ctx.storage.put("guestbook", guestbook);
-		await this.scheduleExpiration();
+		await this.scheduleExpiration(guestbook);
+
 		const visitors = await this.incrementVisitors();
 
 		const entry = existingEntry ?? guestbook[guestbook.length - 1];
