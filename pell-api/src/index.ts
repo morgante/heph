@@ -10,9 +10,7 @@ export default {
 	 * @returns The response to be sent back to the client
 	 */
 	async fetch(request, env, ctx): Promise<Response> {
-		const id: DurableObjectId = env.DURABLE_STATE.idFromName(
-			new URL(request.url).pathname,
-		);
+		const id: DurableObjectId = env.DURABLE_STATE.idFromName(env.APP);
 
 		const stub = env.DURABLE_STATE.get(id);
 
