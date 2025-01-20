@@ -29,11 +29,6 @@ app.post("/sign", async (c) => {
 });
 
 app.get("/websocket", async (c) => {
-	const username = c.req.query("username");
-	if (!username) {
-		return c.json({ error: "Username is required" }, 400);
-	}
-
 	// Check if it's a WebSocket request
 	const upgradeHeader = c.req.header("Upgrade");
 	if (!upgradeHeader || upgradeHeader !== "websocket") {
@@ -44,13 +39,7 @@ app.get("/websocket", async (c) => {
 	const id: DurableObjectId = env.DURABLE_STATE.idFromName(env.APP);
 	const stub = env.DURABLE_STATE.get(id);
 
-	const pair = new WebSocketPair();
-	await stub.handleWebSocket(pair[1], username);
-
-	return new Response(null, {
-		status: 101,
-		webSocket: pair[0],
-	});
+	return stub.fetch(c.req.raw);
 });
 
 export default {
