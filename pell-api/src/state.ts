@@ -1,6 +1,6 @@
 import { DurableObject } from "cloudflare:workers";
 
-const EXPIRATION_MS = 1000; // 1 second in milliseconds
+const EXPIRATION_MS = (env: Env) => Number(env.GUESTBOOK_EXPIRATION_MS); // Expiration time in milliseconds from environment variable
 
 export interface GuestbookEntry {
 	username: string;
@@ -10,6 +10,13 @@ export interface GuestbookEntry {
 }
 
 export class SharedState extends DurableObject<Env> {
+	ctx: DurableObjectState;
+
+	constructor(state: DurableObjectState, env: Env) {
+		super(state, env);
+		this.ctx = state;
+	}
+
 	private async expire() {
 		console.log("Expiring guestbook");
 
@@ -19,7 +26,7 @@ export class SharedState extends DurableObject<Env> {
 		const filtered = guestbook.filter((entry) => {
 			const lastVisit = new Date(entry.lastVisitDate);
 			const diff = now.getTime() - lastVisit.getTime();
-			return diff <= EXPIRATION_MS;
+			return diff <= EXPIRATION_MS(this.env);
 		});
 
 		if (filtered.length !== guestbook.length) {
@@ -50,7 +57,9 @@ export class SharedState extends DurableObject<Env> {
 		});
 
 		const expirationTime =
-			new Date(nextToExpire.lastVisitDate).getTime() + EXPIRATION_MS + 100;
+			new Date(nextToExpire.lastVisitDate).getTime() +
+			EXPIRATION_MS(this.env) +
+			100;
 		await this.ctx.storage.setAlarm(expirationTime);
 	}
 

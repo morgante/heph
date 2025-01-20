@@ -30,7 +30,8 @@
 	 */
 	"vars": {
 		// Identifier for app, shared across deployment
-		"APP": "pell"
+		"APP": "pell",
+		"GUESTBOOK_EXPIRATION_MS": 1000
 	}
 
 	/**
