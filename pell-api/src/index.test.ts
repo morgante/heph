@@ -22,6 +22,7 @@ describe("Guestbook API", () => {
 	beforeAll(async () => {
 		worker = await unstable_dev("src/index.ts", {
 			experimental: { disableExperimentalWarning: true },
+			env: "test",
 		});
 	});
 
@@ -72,7 +73,7 @@ describe("Guestbook API", () => {
 		const data1 = (await resp1.json()) as GuestbookResponse;
 
 		// Wait a bit to ensure different timestamps
-		await new Promise((resolve) => setTimeout(resolve, 100));
+		await new Promise((resolve) => setTimeout(resolve, 10));
 
 		const resp2 = await worker.fetch(`/sign?username=${username}`, {
 			method: "POST",
@@ -86,7 +87,7 @@ describe("Guestbook API", () => {
 		expect(data2.visitors).toBeGreaterThan(data1.visitors);
 	});
 
-	it("should expire guestbook after 1 second", async () => {
+	it("should expire guestbook after expiration time", async () => {
 		const username = "test_user_expire";
 		const resp = await worker.fetch(`/sign?username=${username}`, {
 			method: "POST",
@@ -101,8 +102,8 @@ describe("Guestbook API", () => {
 			visitorId: expect.any(String),
 		});
 
-		// Wait a bit to ensure different timestamps
-		await new Promise((resolve) => setTimeout(resolve, 3000));
+		// Wait for expiration (100ms in test env + buffer)
+		await new Promise((resolve) => setTimeout(resolve, 150));
 
 		const resp2 = await worker.fetch(`/sign?username=${username}`, {
 			method: "POST",

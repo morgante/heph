@@ -31,7 +31,15 @@
 	"vars": {
 		// Identifier for app, shared across deployment
 		"APP": "pell",
-		"GUESTBOOK_EXPIRATION_MS": 1000
+		"GUESTBOOK_EXPIRATION_MS": 10000
+	},
+	"env": {
+		"test": {
+			"vars": {
+				"APP": "pelltest",
+				"GUESTBOOK_EXPIRATION_MS": 100
+			}
+		}
 	}
 
 	/**
