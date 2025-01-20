@@ -84,7 +84,8 @@ export class SharedState extends DurableObject<Env> {
 
 	async visit() {
 		const visitors = await this.incrementVisitors();
-		return { visitors };
+		const guestbook = await this.getAndExpire();
+		return { visitors, guestbook: guestbook.length };
 	}
 
 	async sign(username: string) {
