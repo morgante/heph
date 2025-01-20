@@ -5,14 +5,14 @@ type Variables = Record<string, never>;
 
 const app = new Hono<{ Bindings: Env; Variables: Variables }>();
 
-app.get("/", async (c) => {
-	const env = c.env;
-	const id: DurableObjectId = env.DURABLE_STATE.idFromName(env.APP);
-	const stub = env.DURABLE_STATE.get(id);
-	const { visitors } = await stub.visit();
+// app.get("/", async (c) => {
+// 	const env = c.env;
+// 	const id: DurableObjectId = env.DURABLE_STATE.idFromName(env.APP);
+// 	const stub = env.DURABLE_STATE.get(id);
+// 	const { visitors } = await stub.visit();
 
-	return c.json({ visitors });
-});
+// 	return c.json(visitors);
+// });
 
 app.post("/sign", async (c) => {
 	const username = c.req.query("username");
@@ -23,9 +23,9 @@ app.post("/sign", async (c) => {
 	const env = c.env;
 	const id: DurableObjectId = env.DURABLE_STATE.idFromName(env.APP);
 	const stub = env.DURABLE_STATE.get(id);
-	const result = await stub.sign(username);
+	// const result = await stub.sign(username);
 
-	return c.json(result);
+	return stub.sign(username, c.req.raw);
 });
 
 export default {
