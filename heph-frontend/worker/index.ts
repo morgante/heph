@@ -1,7 +1,5 @@
 export default {
-	fetch(request) {
-		const url = new URL(request.url);
-
+	fetch(_request: Request) {
 		return new Response(null, { status: 404 });
 	},
 } satisfies ExportedHandler<Env>;
