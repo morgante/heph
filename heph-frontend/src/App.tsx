@@ -1,42 +1,34 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import cloudflareLogo from './assets/Cloudflare_Logo.svg'
 import './App.css'
 import { SubscribeForm } from './subscribe'
 
 function App() {
-  const [count, setCount] = useState(0)
-  const [name, setName] = useState('unknown')
+  const recentPosts = [
+    { title: 'Post title coming soon', date: '2025' },
+  ]
 
   return (
-    <>
-      <div>
-        <a href='https://vite.dev' target='_blank'>
-          <img src={viteLogo} className='logo' alt='Vite logo' />
-        </a>
-        <a href='https://react.dev' target='_blank'>
-          <img src={reactLogo} className='logo react' alt='React logo' />
-        </a>
-        <a href='https://workers.cloudflare.com/' target='_blank'>
-          <img src={cloudflareLogo} className='logo cloudflare' alt='Cloudflare logo' />
-        </a>
-      </div>
-      <h1>morgante.net</h1>
-      <div className='card'>
-        <button
-          onClick={() => setCount((count) => count + 1)}
-          aria-label='increment'
-        >
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <SubscribeForm />
+    <div className="container">
+      <header>
+        <h1>Morgante Pell</h1>
+      </header>
 
-    </>
+      <section className="recent-posts">
+        <h2>Recent posts</h2>
+        <div className="posts-list">
+          {recentPosts.map((post, index) => (
+            <div key={index} className="post-item">
+              <span className="post-date">{post.date}</span>
+              <span className="post-title">{post.title}</span>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="subscribe-section">
+        <h2>Subscribe</h2>
+        <SubscribeForm />
+      </section>
+    </div>
   )
 }
 
