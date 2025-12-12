@@ -9,8 +9,7 @@
 		"lint": "eslint .",
 		"preview": "pnpm run build && vite preview",
 		"deploy": "pnpm run build && wrangler deploy",
-		"cf-typegen": "wrangler types",
-		"build:declarations": "tsc --project tsconfig.declarations.json"
+		"cf-typegen": "wrangler types"
 	},
 	"dependencies": {
 		"react": "^19.1.1",
