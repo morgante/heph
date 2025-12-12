@@ -1,11 +1,8 @@
 import './App.css'
+import { Wrapper } from './design/wrapper'
 import { SubscribeForm } from './subscribe'
 
 function App() {
-  const recentPosts = [
-    { title: 'Post title coming soon', date: '2025' },
-  ]
-
   return (
     <div className="container">
       <header>
@@ -14,6 +11,7 @@ function App() {
 
       <section className="recent-posts">
         <h2>Recent posts</h2>
+        <Wrapper />
         <div className="posts-list">
           {recentPosts.map((post, index) => (
             <div key={index} className="post-item">

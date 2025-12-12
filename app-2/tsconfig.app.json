@@ -24,10 +24,11 @@
     "noUncheckedSideEffectImports": true,
 
     /* Path aliases */
-    "baseUrl": ".",
     "paths": {
-      "@ds/inject/*": ["../design-inject/*"]
+      "@design-system/*": ["../heph-frontend/src/design/*"],
+      "@ds/contract": ["../heph-frontend/src/design-inject/index"],
+      "@ds/inject/*": ["./src/design-inject/*"]
     }
   },
-  "include": ["src", "../design-inject"]
+  "include": ["src", "../heph-frontend/src/design", "../heph-frontend/src/design-inject"]
 }
