@@ -1,5 +1,6 @@
 import './App.css'
 import { SubscribeForm } from './subscribe'
+import * as DS from './contexts/DS'
 
 function App() {
   const recentPosts = [
@@ -10,6 +11,7 @@ function App() {
     <div className="container">
       <header>
         <h1>Morgante Pell</h1>
+        <DS.Greeting name="Morgante" />
       </header>
 
       <section className="recent-posts">
