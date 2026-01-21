@@ -22,6 +22,14 @@ interface MessageEntry {
 	username: string;
 	message: string;
 	createdAt: string;
+	replies: ReplyEntry[];
+}
+
+interface ReplyEntry {
+	id: string;
+	username: string;
+	message: string;
+	createdAt: string;
 }
 
 interface MessageResponse {
@@ -33,6 +41,13 @@ interface MessageResponse {
 interface MessageListResponse {
 	messages: MessageEntry[];
 	total: number;
+}
+
+interface ReplyResponse {
+	success: boolean;
+	messageId: string;
+	reply: ReplyEntry;
+	totalReplies: number;
 }
 
 describe("Guestbook API", () => {
@@ -175,6 +190,7 @@ describe("Guestbook API", () => {
 			username,
 			message,
 			createdAt: expect.any(String),
+			replies: [],
 		});
 
 		const listResp = await worker.fetch("/messages");
@@ -185,5 +201,73 @@ describe("Guestbook API", () => {
 		expect(
 			listData.messages.some((entry) => entry.id === created.message.id),
 		).toBe(true);
+		expect(
+			listData.messages.every((entry) => Array.isArray(entry.replies)),
+		).toBe(true);
+	});
+
+	it("should add replies to messages", async () => {
+		const createResp = await worker.fetch("/messages", {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({
+				username: "original_author",
+				message: "Original message",
+			}),
+		});
+		expect(createResp.status).toBe(200);
+		const created = (await createResp.json()) as MessageResponse;
+
+		const replyPayload = {
+			username: "reply_author",
+			message: "Replying to the original",
+		};
+		const replyResp = await worker.fetch(
+			`/messages/${created.message.id}/replies`,
+			{
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify(replyPayload),
+			},
+		);
+
+		expect(replyResp.status).toBe(200);
+		const replyData = (await replyResp.json()) as ReplyResponse;
+		expect(replyData).toEqual({
+			success: true,
+			messageId: created.message.id,
+			totalReplies: 1,
+			reply: {
+				id: expect.any(String),
+				username: replyPayload.username,
+				message: replyPayload.message,
+				createdAt: expect.any(String),
+			},
+		});
+
+		const listResp = await worker.fetch("/messages");
+		const listData = (await listResp.json()) as MessageListResponse;
+		const target = listData.messages.find(
+			(entry) => entry.id === created.message.id,
+		);
+		expect(target).toBeTruthy();
+		expect(target?.replies.some((reply) => reply.id === replyData.reply.id)).toBe(
+			true,
+		);
+	});
+
+	it("should return 404 when replying to missing message", async () => {
+		const resp = await worker.fetch("/messages/missing/replies", {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({
+				username: "missing_reply",
+				message: "Replying to nothing",
+			}),
+		});
+
+		expect(resp.status).toBe(404);
+		const data = (await resp.json()) as { error: string };
+		expect(data).toEqual({ error: "Message not found" });
 	});
 });
