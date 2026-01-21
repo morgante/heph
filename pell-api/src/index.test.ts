@@ -17,6 +17,24 @@ interface GuestbookResponse {
 	visitors: number;
 }
 
+interface MessageEntry {
+	id: string;
+	username: string;
+	message: string;
+	createdAt: string;
+}
+
+interface MessageResponse {
+	success: boolean;
+	message: MessageEntry;
+	total: number;
+}
+
+interface MessageListResponse {
+	messages: MessageEntry[];
+	total: number;
+}
+
 describe("Guestbook API", () => {
 	let worker: Unstable_DevWorker;
 
@@ -112,5 +130,60 @@ describe("Guestbook API", () => {
 		expect(resp2.status).toBe(200);
 		const data2 = (await resp2.json()) as GuestbookResponse;
 		expect(data2.entry.visitorId).not.toBe(data.entry.visitorId); // Should get new visitor ID after expiration
+	});
+
+	it("should require username for messages endpoint", async () => {
+		const resp = await worker.fetch("/messages", {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({ message: "Hello there" }),
+		});
+
+		expect(resp.status).toBe(400);
+		const data = (await resp.json()) as { error: string };
+		expect(data).toEqual({ error: "Username is required" });
+	});
+
+	it("should require message for messages endpoint", async () => {
+		const resp = await worker.fetch("/messages", {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({ username: "message_user" }),
+		});
+
+		expect(resp.status).toBe(400);
+		const data = (await resp.json()) as { error: string };
+		expect(data).toEqual({ error: "Message is required" });
+	});
+
+	it("should create and list messages", async () => {
+		const username = "message_author";
+		const message = "Hello from the guestbook";
+
+		const createResp = await worker.fetch("/messages", {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({ username, message }),
+		});
+
+		expect(createResp.status).toBe(200);
+		const created = (await createResp.json()) as MessageResponse;
+		expect(created).toHaveProperty("success", true);
+		expect(created).toHaveProperty("total");
+		expect(created.message).toEqual({
+			id: expect.any(String),
+			username,
+			message,
+			createdAt: expect.any(String),
+		});
+
+		const listResp = await worker.fetch("/messages");
+		expect(listResp.status).toBe(200);
+		const listData = (await listResp.json()) as MessageListResponse;
+		expect(listData).toHaveProperty("total");
+		expect(Array.isArray(listData.messages)).toBe(true);
+		expect(
+			listData.messages.some((entry) => entry.id === created.message.id),
+		).toBe(true);
 	});
 });

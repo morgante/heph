@@ -1,12 +1,20 @@
 import { DurableObject } from "cloudflare:workers";
 
 const EXPIRATION_MS = (env: Env) => Number(env.GUESTBOOK_EXPIRATION_MS); // Expiration time in milliseconds from environment variable
+const MAX_MESSAGES = 100;
 
 export interface GuestbookEntry {
 	username: string;
 	signInDate: string;
 	lastVisitDate: string;
 	visitorId: string;
+}
+
+export interface MessageEntry {
+	id: string;
+	username: string;
+	message: string;
+	createdAt: string;
 }
 
 export class SharedState extends DurableObject<Env> {
@@ -82,6 +90,12 @@ export class SharedState extends DurableObject<Env> {
 		return value;
 	}
 
+	private async getMessages() {
+		const messages: MessageEntry[] =
+			(await this.ctx.storage.get("messages")) ?? [];
+		return messages;
+	}
+
 	async visit() {
 		const visitors = await this.incrementVisitors();
 		const guestbook = await this.getAndExpire();
@@ -119,6 +133,33 @@ export class SharedState extends DurableObject<Env> {
 			success: true,
 			entry: responseEntry,
 			visitors,
+		};
+	}
+
+	async listMessages() {
+		const messages = await this.getMessages();
+		return {
+			total: messages.length,
+			messages,
+		};
+	}
+
+	async addMessage(username: string, message: string) {
+		const now = new Date().toISOString();
+		const messages = await this.getMessages();
+		const entry: MessageEntry = {
+			id: crypto.randomUUID(),
+			username,
+			message,
+			createdAt: now,
+		};
+		const nextMessages = [...messages, entry].slice(-MAX_MESSAGES);
+		await this.ctx.storage.put("messages", nextMessages);
+
+		return {
+			success: true,
+			message: entry,
+			total: nextMessages.length,
 		};
 	}
 }
