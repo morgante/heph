@@ -1,6 +1,8 @@
 import { DurableObject } from "cloudflare:workers";
 
 const EXPIRATION_MS = (env: Env) => Number(env.GUESTBOOK_EXPIRATION_MS); // Expiration time in milliseconds from environment variable
+const MAX_MESSAGES = 100;
+const MAX_REPLIES = 100;
 
 export interface GuestbookEntry {
 	username: string;
@@ -8,6 +10,25 @@ export interface GuestbookEntry {
 	lastVisitDate: string;
 	visitorId: string;
 }
+
+export interface MessageEntry {
+	id: string;
+	username: string;
+	message: string;
+	createdAt: string;
+	replies: ReplyEntry[];
+}
+
+export interface ReplyEntry {
+	id: string;
+	username: string;
+	message: string;
+	createdAt: string;
+}
+
+type StoredMessageEntry = Omit<MessageEntry, "replies"> & {
+	replies?: ReplyEntry[];
+};
 
 export class SharedState extends DurableObject<Env> {
 	ctx: DurableObjectState;
@@ -82,6 +103,15 @@ export class SharedState extends DurableObject<Env> {
 		return value;
 	}
 
+	private async getMessages() {
+		const messages: StoredMessageEntry[] =
+			(await this.ctx.storage.get("messages")) ?? [];
+		return messages.map((entry) => ({
+			...entry,
+			replies: entry.replies ?? [],
+		}));
+	}
+
 	async visit() {
 		const visitors = await this.incrementVisitors();
 		const guestbook = await this.getAndExpire();
@@ -119,6 +149,71 @@ export class SharedState extends DurableObject<Env> {
 			success: true,
 			entry: responseEntry,
 			visitors,
+		};
+	}
+
+	async listMessages() {
+		const messages = await this.getMessages();
+		return {
+			total: messages.length,
+			messages,
+		};
+	}
+
+	async addMessage(username: string, message: string) {
+		const now = new Date().toISOString();
+		const messages = await this.getMessages();
+		const entry: MessageEntry = {
+			id: crypto.randomUUID(),
+			username,
+			message,
+			createdAt: now,
+			replies: [],
+		};
+		const nextMessages = [...messages, entry].slice(-MAX_MESSAGES);
+		await this.ctx.storage.put("messages", nextMessages);
+
+		return {
+			success: true,
+			message: entry,
+			total: nextMessages.length,
+		};
+	}
+
+	async addReply(messageId: string, username: string, message: string) {
+		const now = new Date().toISOString();
+		const messages = await this.getMessages();
+		const messageIndex = messages.findIndex((entry) => entry.id === messageId);
+
+		if (messageIndex === -1) {
+			return {
+				success: false,
+				error: "Message not found",
+			};
+		}
+
+		const reply: ReplyEntry = {
+			id: crypto.randomUUID(),
+			username,
+			message,
+			createdAt: now,
+		};
+
+		const target = messages[messageIndex];
+		const nextReplies = [...target.replies, reply].slice(-MAX_REPLIES);
+		const nextMessages = [...messages];
+		nextMessages[messageIndex] = {
+			...target,
+			replies: nextReplies,
+		};
+
+		await this.ctx.storage.put("messages", nextMessages);
+
+		return {
+			success: true,
+			reply,
+			messageId,
+			totalReplies: nextReplies.length,
 		};
 	}
 }
