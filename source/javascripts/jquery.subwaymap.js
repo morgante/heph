@@ -520,13 +520,12 @@ THE SOFTWARE.
                 pos = "text-align: left; padding-left: " + offset + "px; margin: 0 0 " + offset + "px 0";
                 topOffset = offset * 2;
                 break;
-            case "sw": //TODO
-                pos = "text-align: right; margin:0 " + offset + "px 0 -" + (100 + offset) + "px";
-                topOffset = offset;
+            case "sw":
+                pos = "text-align: right; margin:" + offset + "px " + offset + "px 0 -" + (100 + offset) + "px";
                 break;
-            case "nw": //TODO
-                pos = "text-align: right; margin:0 " + offset + "px 0 -" + (100 + offset) + "px";
-                topOffset = offset;
+            case "nw":
+                pos = "text-align: right; padding-right: " + offset + "px; margin: 0 " + offset + "px " + offset + "px -" + (100 + offset) + "px";
+                topOffset = offset * 2;
                 break;
         }
         var style = (textClass != "" ? "class='" + textClass + "' " : "") + "style='" + (textClass == "" ? "font-size:8pt;font-family:Verdana,Arial,Helvetica,Sans Serif;text-decoration:none;" : "") + "width:100px;" + (pos != "" ? pos : "") + ";position:absolute;top:" + (y + el.offset().top - (topOffset > 0 ? topOffset : 0)) + "px;left:" + (x + el.offset().left) + "px;z-index:3000;'";
