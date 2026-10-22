@@ -31,15 +31,15 @@ var manager = {
 	travel: function() {
         $('#travel_map_canvas').vectorMap({
 			map: 'world_mill_en',
-			scaleColors: ['#C8EEFF', '#0071A4'],
+			scaleColors: ['#C8FFD1', '#00A41B'],
 			normalizeFunction: 'polynomial',
 			hoverOpacity: 0.7,
 			hoverColor: false,
 			// series: {
 			// 	regions: [{
 			// 		scale: {
-			// 			'1': '#4169E1',
-			// 			'2': '#FF69B4'
+			// 			'1': '#41E15C',
+			// 			'2': '#69FF82'
 			// 		},
 			// 		attribute: 'fill',
 			// 		values: data['year2007'].results
@@ -47,7 +47,7 @@ var manager = {
 			// },
 			regionStyle: {
 				initial: {
-					fill: '#4A9FC5',
+					fill: '#4AC55F',
 					"fill-opacity": 1,
 					stroke: 'none',
 					"stroke-width": 0,
@@ -59,8 +59,8 @@ var manager = {
 			},
 			markerStyle: {
 				initial: {
-					fill: '#FFBE00',
-					stroke: '#383f47'
+					fill: '#00FF2B',
+					stroke: '#38473b'
 				}
 			},
 			backgroundColor: '#111111',

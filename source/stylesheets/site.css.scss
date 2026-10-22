@@ -111,7 +111,7 @@ a {
 }
 
 a:hover, a:focus {
-  color: #FFBE00;
+  color: #00FF2B;
 /*  text-decoration: underline;*/
 }
 
@@ -128,7 +128,7 @@ body {
 
 /* ==PAGE */
 html {
-  background: #111111 url('../images/background_body.png') repeat-x 0px 160px;
+  background: #0D1A0F url('../images/background_body.png') repeat-x 0px 160px;
 /*  overflow: hidden;*/
 }
 
@@ -143,7 +143,7 @@ body {
 
 /* ==HEADER */
 #header {
-  background: #6D1D1D url('../images/background_header.png') repeat-x left top;
+  background: #1D6D2A url('../images/background_header.png') repeat-x left top;
   height: 160px;
   width: 100%;
   z-index: 10000;
@@ -163,7 +163,7 @@ body {
 #header h1, #header h2 {
   font-size: 210%;
   margin: 5px 10px;
-  color: #FFBE00;
+  color: #00FF2B;
   font-family: Times, 'Times New Roman', Georgia, serif;
 /*  line-height: 20px;*/
 }
@@ -181,16 +181,18 @@ body {
 /* ===WARNING */
 body.warned .overlay-warning {
   font-size: 200%;
+  background: #E3F5E6;
+  color: #2B6B36;
   border-radius: 0;
-  border-top: 5px solid #8a6d3b;
-  border-bottom: 5px solid #8a6d3b;
+  border-top: 5px solid #3b8a48;
+  border-bottom: 5px solid #3b8a48;
   text-align: center;
   position: relative;
   top: -15px;
 }
 
 .overlay-warning a {
-  color: #8a6d3b;
+  color: #3b8a48;
   text-decoration: underline;
 }
 
@@ -252,7 +254,7 @@ body.warned .overlay-warning {
 
 #sidebar .navigation li a:hover {
   background-position: 0px -25px;
-  color: #FFBE00;
+  color: #00FF2B;
 }
 
 /* ===TWITTER */
@@ -321,8 +323,8 @@ body.warned .overlay-warning {
 /* ==FOOTER */
 #footer {
   clear: both;
-  border-top: 1px solid #292929;
-  background: #000000;
+  border-top: 1px solid #1E3A24;
+  background: #04140A;
   opacity: 0.9;
   position: fixed;
   left: 0;
@@ -352,7 +354,7 @@ body.warned .overlay-warning {
 #content {
   margin: 10px 10px 10px 0;
   width: 650px;
-  color: #BEBEA6;
+  color: #A6BEAA;
 }
 
 #content.full {
@@ -410,8 +412,8 @@ body #content p.introduction, body.index #content p, body.index #content h4 {
   padding-left:40px;
   background-repeat: no-repeat;
   background-position: 7px 3px;
-  border: 1px solid #6D1B1B;
-  background-color: #B65151;
+  border: 1px solid #1B6D29;
+  background-color: #51B662;
   line-height: 30px;
 /*  color: #FFFFFF;*/
 }
@@ -424,8 +426,8 @@ body #content p.introduction, body.index #content p, body.index #content h4 {
 }
 
 #content ul.elsewhere li a:hover, #content ul.elsewhere li a:focus {
-  background-color: #6D1B1B;
-  border-color: #470707;
+  background-color: #1B6D29;
+  border-color: #074712;
 }
 
 ul.elsewhere li.blog a {
@@ -580,7 +582,7 @@ ul.elsewhere li.shelfari a {
   width:230px;
 }
 #jambo .field p.error {
-  color: #E20026;
+  color: #00E226;
 }
 /* ====TEXT */
 #jambo .field.text input {
@@ -596,10 +598,10 @@ ul.elsewhere li.shelfari a {
   background-color:#FFFFFF;
 }
 #jambo .field.error.text input {
-  background:#FFB3B3;
+  background:#B3FFC0;
 }
 #jambo .field.error label {
-  color:#E20026;
+  color:#00E226;
 }
 /* ====MESSAGE */
 #jambo .field.textarea label {
@@ -626,7 +628,7 @@ ul.elsewhere li.shelfari a {
 }
 
 #jambo .field.textarea.error textarea {
-  background:#FFB7CD none repeat scroll 0%;
+  background:#B7FFC3 none repeat scroll 0%;
 }
 /* ====SUBMIT */
 #jambo .field.submit {
@@ -678,7 +680,7 @@ body.lifestream #stream .item {
   opacity:0.6;
 }
 body.lifestream #stream .item h3 {
-  color: #FFBE00;
+  color: #00FF2B;
   font-size: 160%;
 }
 body.lifestream #stream .item p {
@@ -693,7 +695,7 @@ body.lifestream #stream .item p {
 
 .lifemap .days li {
   height: 0.1px;
-  background: red;
+  background: green;
 }
 
 .lifemap .items {

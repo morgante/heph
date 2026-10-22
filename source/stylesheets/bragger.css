@@ -17,19 +17,19 @@ ol.bragger.navigation li:nth-child(n+5) {
 ol.bragger.navigation li a {
 	display: block;
 	color: #CECECE;
-	border-bottom: #FFBE00 none 1px;
+	border-bottom: #00FF2B none 1px;
 	padding-left: 5px;
 	line-height:1.8em;
 	text-decoration: none;
 }
 
 ol.bragger.navigation li a:hover {
-	background: #EDC58E;
+	background: #8EED9E;
 	color: #333;
 }
 
 ol.bragger.navigation li.active a {
-	color: #FFBE00;
+	color: #00FF2B;
 }
 
 ol.bragger.navigation li a:before {
@@ -43,7 +43,7 @@ ol.bragger.navigation:first-child {
 /* ==HEADER */
 #header strong.count {
 	font-weight: bold;
-	color: #FFBE00;
+	color: #00FF2B;
 }
 
 /* ==HEADINGS */
@@ -114,7 +114,7 @@ p.help {
 
 /* ==CONTENT */
 #content section .container strong {
-	color: #FFBE00;
+	color: #00FF2B;
 }
 #content section .container em {
 	font-style: normal;
@@ -146,7 +146,7 @@ ul.splitter.two li {
 }
 ul.splitter li h2 a, ul.splitter li h2 strong {
 	display: block;
-	background: red;
+	background: green;
 	padding: 0 0.2em;
 	font-size: 160%;
 	position: absolute;
@@ -246,7 +246,7 @@ ul.apps.icons li.blog a span {
     top: 30px;
 }
 #skills .graph .skill {
-  fill: blue;
+  fill: green;
 }
 #skills .graph .skill.hover {
 /*    cursor: pointer;*/
@@ -255,70 +255,70 @@ ul.apps.icons li.blog a span {
     fill: #FFF;
 }
 #skills .graph .skill.python {
-	fill: #326342;
+	fill: #32633A;
 }
 #skills .graph .skill.java {
-	fill: #5382A1;
+	fill: #53A160;
 }
 #skills .graph .skill.html {
-	fill: #E34C26;
+	fill: #26E346;
 }
 #skills .graph .skill.css {
-	fill: #28A9E0;
+	fill: #28E047;
 }
 #skills .graph .skill.js {
-	fill: #F8DC3D;
+	fill: #3DF85C;
 }
 #skills .graph .skill.node {
-	fill: #8BC84B;
+	fill: #4BC860;
 }
 #skills .graph .skill.wp {
-	fill: #21759b;
+	fill: #219b35;
 }
 #skills .graph .skill.php {
-	fill: #9999CC;
+	fill: #99CCA2;
 }
 #skills .graph .skill.sql {
-	fill: #E87912;
+	fill: #12E836;
 }
 #skills .graph .skill.debate {
-	fill: #6D1C1C;
+	fill: #1C6D2A;
 }
 #skills .graph .skill.writing {
-	fill: #B66C6C;
+	fill: #6CB678;
 }
 #skills .graph .skill.finance {
-	fill: #DA993C;
+	fill: #3CDA56;
 }
 
 /* ==POSITIONS */
 #position-mastermade a {
-	background: #6666B3;
+	background: #66B373;
 }
 #position-crassus a {
-	background: #027240;
+	background: #027215;
 }
 #position-fundshift a {
-	background: #DB1959;
+	background: #19DB39;
 }
 
 .position.nyuad a {
-	background: #571590;
+	background: #15902A;
 }
 #position-uwc a {
-	background: #009086;
+	background: #009018;
 }
 #position-habari a {
-	background: #4A4A4A;
+	background: #3F5C45;
 }
 .position.globalclassroom a {
-	background: #C64027;
+	background: #27C642;
 }
 .position.sila a {
-	background: #097F9E;
+	background: #099E22;
 }
 .position.s2oh a {
-	background: #6096BF;
+	background: #60BF70;
 }
 
 /* ==PROJECTS */
@@ -452,13 +452,13 @@ section#fun ul li.stack {
 }
 
 .section.fun.debate strong {
-	background: #6666B3;
+	background: #66B373;
 }
 .section.fun.hiking strong {
-	background: #027240;
+	background: #027215;
 }
 .section.fun.travel strong {
-	background: #E34C26;
+	background: #26E346;
 }
 
 /* ==CONCLUSION */
